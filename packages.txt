@@ -1,11 +1,6 @@
-cd C:\Users\PMLS\Documents\brain-tumor-detection-app-using-yolov11\brain-tumor-streamlit
-
-# Create the file
-@"
 libgl1
 libglib2.0-0
 libsm6
 libxext6
 libxrender1
 libgomp1
-"@ | Out-File -Encoding utf8 packages.txt
