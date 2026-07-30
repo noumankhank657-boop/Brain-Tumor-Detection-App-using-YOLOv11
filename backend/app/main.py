@@ -20,8 +20,7 @@ app.add_middleware(
 )
 
 MODEL_PATH = os.getenv("MODEL_PATH", "weights/best.pt")
-detector = TumorDetector(MODEL_PATH)
-
+detector = TumorDetector()
 @app.get("/", tags=["Root"])
 async def root():
     return {"message": "YOLOv11 Brain Tumor Detection API", "docs": "/docs"}

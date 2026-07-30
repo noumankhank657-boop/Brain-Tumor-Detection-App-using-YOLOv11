@@ -2,17 +2,43 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 import base64
-from typing import List, Tuple
 import time
 import os
+import zipfile
+
+def extract_model_if_needed():
+    zip_path = "weights/best.zip"
+    pt_path = "weights/best.pt"
+    
+    # If .pt exists, nothing to do
+    if os.path.exists(pt_path):
+        return pt_path
+    
+    # If .zip exists but .pt doesn't, extract it
+    if os.path.exists(zip_path):
+        print(f"Extracting model from {zip_path}...")
+        with zipfile.ZipFile(zip_path, 'r') as z:
+            z.extractall("weights/")
+        print(f"Model extracted to {pt_path}")
+        return pt_path
+    
+    # If neither exists, check env var for direct path
+    env_path = os.getenv("MODEL_PATH")
+    if env_path and os.path.exists(env_path):
+        return env_path
+    
+    raise FileNotFoundError("No model found. Expected weights/best.pt or weights/best.zip")
 
 class TumorDetector:
-    def __init__(self, model_path: str, conf_threshold: float = 0.25, iou_threshold: float = 0.45):
-        self.model_path = model_path
+    def __init__(self, model_path: str = None, conf_threshold: float = 0.25, iou_threshold: float = 0.45):
         self.conf_threshold = conf_threshold
         self.iou_threshold = iou_threshold
         self.model = None
         self.device = None
+        
+        # Auto-extract if needed
+        actual_path = extract_model_if_needed() if model_path is None else model_path
+        self.model_path = actual_path
         self._load_model()
 
     def _load_model(self):
