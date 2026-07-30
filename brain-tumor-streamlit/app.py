@@ -1,7 +1,9 @@
-import streamlit as st
 import os
+os.environ["OPENCV_LOG_LEVEL"] = "SILENT"
+
+import streamlit as st
 import zipfile
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 import numpy as np
 
 # ========== PAGE SETUP ==========
@@ -25,7 +27,7 @@ st.markdown('<div class="main-title">🧠 Brain Tumor Detection</div>', unsafe_a
 st.markdown('<div class="subtitle">Advanced MRI & CT scan analysis powered by YOLOv11</div>', unsafe_allow_html=True)
 
 # ========== AUTO-EXTRACT MODEL ==========
-ZIP_PATH = "brain-tumor-streamlit/best.zip" if os.path.exists("brain-tumor-streamlit/best.zip") else "best.zip"
+ZIP_PATH = "best.zip"
 PT_PATH = "best.pt"
 
 if not os.path.exists(PT_PATH) and os.path.exists(ZIP_PATH):
@@ -38,10 +40,9 @@ if not os.path.exists(PT_PATH):
     st.error("Model not found. Please ensure `best.zip` is in the repository.")
     st.stop()
 
-# ========== LOAD MODEL (lazy import to avoid cv2 at startup) ==========
+# ========== LOAD MODEL ==========
 @st.cache_resource
 def load_model():
-    # Import here so Streamlit page renders even if model loads slow
     from ultralytics import YOLO
     return YOLO(PT_PATH)
 
@@ -63,11 +64,8 @@ if uploaded_file:
     
     if st.button("🔍 Analyze Scan"):
         with st.spinner("Running YOLOv11 inference..."):
-            # Convert PIL to numpy for YOLO
             img_np = np.array(image)
             results = model(img_np, conf=0.25, iou=0.45, verbose=False)
-            
-            # Plot results (ultralytics handles annotation)
             annotated = results[0].plot(line_width=2, font_size=0.6)
             
             with col2:
