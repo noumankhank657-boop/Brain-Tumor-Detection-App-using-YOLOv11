@@ -4,20 +4,79 @@ import zipfile
 from PIL import Image
 import numpy as np
 
-# ========== PATH SETUP (CRITICAL FIX) ==========
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-ZIP_PATH = os.path.join(BASE_DIR, "best.zip")
-PT_PATH = os.path.join(BASE_DIR, "best.pt")
+# ========== DEBUG: Show what's happening ==========
+st.write("🔧 Debug Info:")
+st.write("Current working directory:", os.getcwd())
+st.write("__file__ path:", os.path.abspath(__file__))
 
-if not os.path.exists(PT_PATH) and os.path.exists(ZIP_PATH):
-    with st.spinner("Extracting model for first use..."):
-        with zipfile.ZipFile(ZIP_PATH, 'r') as z:
-            z.extractall(BASE_DIR)  # Extract into the same folder
-        st.success("Model ready!")
+app_dir = os.path.dirname(os.path.abspath(__file__))
+st.write("App directory:", app_dir)
+
+try:
+    files_in_app_dir = os.listdir(app_dir)
+    st.write("Files in app dir:", files_in_app_dir)
+except Exception as e:
+    st.write("Error listing app dir:", str(e))
+
+try:
+    files_in_cwd = os.listdir(os.getcwd())
+    st.write("Files in cwd:", files_in_cwd)
+except Exception as e:
+    st.write("Error listing cwd:", str(e))
+
+# ========== PATH SETUP ==========
+# Try every possible location
+possible_zip_paths = [
+    os.path.join(app_dir, "best.zip"),
+    os.path.join(os.getcwd(), "best.zip"),
+    os.path.join(os.getcwd(), "brain-tumor-streamlit", "best.zip"),
+    "best.zip",
+    "brain-tumor-streamlit/best.zip",
+]
+
+ZIP_PATH = None
+for p in possible_zip_paths:
+    st.write(f"Checking: {p} → Exists: {os.path.exists(p)}")
+    if os.path.exists(p):
+        ZIP_PATH = p
+        break
+
+PT_PATH = os.path.join(app_dir, "best.pt")
+
+# ========== EXTRACT MODEL ==========
+if not os.path.exists(PT_PATH):
+    if ZIP_PATH:
+        st.info(f"Extracting model from: {ZIP_PATH}")
+        try:
+            with zipfile.ZipFile(ZIP_PATH, 'r') as z:
+                z.extractall(app_dir)
+            st.success("Model extracted successfully!")
+        except Exception as e:
+            st.error(f"Failed to extract: {str(e)}")
+            st.stop()
+    else:
+        st.error("❌ best.zip not found in any location!")
+        st.stop()
+
+if not os.path.exists(PT_PATH):
+    st.error("❌ best.pt not found after extraction!")
+    st.stop()
+
+st.success(f"✅ Model found at: {PT_PATH}")
+
+# ========== LOAD MODEL ==========
+@st.cache_resource
+def load_model():
+    from ultralytics import YOLO
+    return YOLO(PT_PATH)
+
+with st.spinner("Loading YOLOv11 model..."):
+    model = load_model()
+
+st.success("✅ Model loaded!")
 
 # ========== PAGE SETUP ==========
 st.set_page_config(page_title="Brain Tumor Detection", page_icon="🧠", layout="wide")
-
 
 st.markdown("""
 <style>
@@ -35,31 +94,6 @@ st.markdown("""
 
 st.markdown('<div class="main-title">🧠 Brain Tumor Detection</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Advanced MRI & CT scan analysis powered by YOLOv11</div>', unsafe_allow_html=True)
-
-# ========== AUTO-EXTRACT MODEL ==========
-ZIP_PATH = "best.zip"
-PT_PATH = "best.pt"
-
-if not os.path.exists(PT_PATH) and os.path.exists(ZIP_PATH):
-    with st.spinner("Extracting model for first use..."):
-        with zipfile.ZipFile(ZIP_PATH, 'r') as z:
-            z.extractall(".")
-        st.success("Model ready!")
-
-if not os.path.exists(PT_PATH):
-    st.error("Model not found. Please ensure `best.zip` is in the repository.")
-    st.stop()
-
-# ========== LOAD MODEL ==========
-@st.cache_resource
-def load_model():
-    from ultralytics import YOLO
-    return YOLO(PT_PATH)
-
-with st.spinner("Loading YOLOv11 model..."):
-    model = load_model()
-
-st.success("✅ Model loaded successfully")
 
 # ========== UPLOAD ==========
 uploaded_file = st.file_uploader("📤 Drop your MRI/CT scan here", type=["jpg", "jpeg", "png"])
