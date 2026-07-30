@@ -1,13 +1,23 @@
-import os
-os.environ["OPENCV_LOG_LEVEL"] = "SILENT"
-
 import streamlit as st
+import os
 import zipfile
 from PIL import Image
 import numpy as np
 
+# ========== PATH SETUP (CRITICAL FIX) ==========
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ZIP_PATH = os.path.join(BASE_DIR, "best.zip")
+PT_PATH = os.path.join(BASE_DIR, "best.pt")
+
+if not os.path.exists(PT_PATH) and os.path.exists(ZIP_PATH):
+    with st.spinner("Extracting model for first use..."):
+        with zipfile.ZipFile(ZIP_PATH, 'r') as z:
+            z.extractall(BASE_DIR)  # Extract into the same folder
+        st.success("Model ready!")
+
 # ========== PAGE SETUP ==========
 st.set_page_config(page_title="Brain Tumor Detection", page_icon="🧠", layout="wide")
+
 
 st.markdown("""
 <style>
