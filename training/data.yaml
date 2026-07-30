@@ -1,0 +1,20 @@
+# =============================================
+# STEP 1: UPDATE THIS FILE WITH YOUR DATASET PATHS
+# =============================================
+
+path: "C:\Users\PMLS\Documents\all datasets\datasets for three assignemnets\brain.yolov11"  # <-- CHANGE THIS to absolute path of your dataset
+
+train: train/images
+val: val/images
+test: test/images
+
+# Brain Tumor Classes 
+nc: 2
+names: ['Astrocytoma', 'Glioblastoma']
+
+roboflow:
+  workspace: deeplearning-0xtxh
+  project: brain-9bxoe-gmieh
+  version: dataset
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/deeplearning-0xtxh/brain-9bxoe-gmieh/dataset/dataset

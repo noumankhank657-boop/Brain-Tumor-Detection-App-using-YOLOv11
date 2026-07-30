@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+*.pt
+!backend/weights/.gitkeep
+runs/
+dataset/
+predictions_output/
+node_modules/
+dist/
+*.zip

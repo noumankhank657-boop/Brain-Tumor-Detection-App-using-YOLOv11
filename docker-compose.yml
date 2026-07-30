@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: brain-tumor-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_PATH=weights/best.pt
+      - PORT=8000
+    volumes:
+      - ./backend/weights:/app/weights:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build: ./frontend
+    container_name: brain-tumor-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
