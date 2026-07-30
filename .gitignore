@@ -2,8 +2,9 @@ __pycache__/
 *.pyc
 .env
 .venv/
+*.pt          # Ignore the extracted model
+!backend/weights/.gitkeep
 runs/
 dataset/
-predictions_output/
 node_modules/
 dist/
