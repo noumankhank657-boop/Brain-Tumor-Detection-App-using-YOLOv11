@@ -657,14 +657,14 @@ if uploaded_file:
             st.markdown("""
             <div style="text-align:center; padding:4rem 2rem; color:#334155;">
                 <div style="font-size:2.5rem; margin-bottom:0.5rem; opacity:0.3;">🔍</div>
-                <div style="font-size:0.9rem;">Click "Scan" to see detection results</div>
+                <div style="font-size:0.9rem;">Click "Analyze Image" to see detection results</div>
             </div>
             """, unsafe_allow_html=True)
 
     # Analyze button
     btn_col1, btn_col2, btn_col3 = st.columns([1, 2, 1])
     with btn_col2:
-        analyze_clicked = st.button("🔍Scan", key="analyze", use_container_width=True)
+        analyze_clicked = st.button("🔍 Analyze Image", key="analyze", use_container_width=True)
 
     if analyze_clicked:
         with st.spinner(""):
