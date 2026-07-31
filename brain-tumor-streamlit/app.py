@@ -610,7 +610,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ========== UPLOAD SECTION ==========
-st.markdown('<div class="upload-zone">', unsafe_allow_html=True)
+
 col_u1, col_u2, col_u3 = st.columns([1, 3, 1])
 with col_u2:
     st.markdown("""
